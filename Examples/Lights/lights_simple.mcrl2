@@ -1,0 +1,21 @@
+sort PreSign = struct P0 | P1 | P2 | P3;
+sort Status = struct on | off;
+sort SignStatus = PreSign -> Status;
+
+act setPreSign: PreSign # Status;
+act readPreSign: PreSign;
+
+map setAllOff: PreSign -> Status;
+var u: PreSign;
+eqn setAllOff(u) = on;
+
+%% Process representing the phone book.
+proc Lights(t: SignStatus) = 
+      sum p: PreSign, l: Status . (l != off ) -> setPreSign(p, l) . Lights(t[p->l])
+    + sum p: PreSign . readPreSign(p) . Lights()
+    ;
+   
+%% Initially the phone book is empty.
+init Lights(setAllOff);
+
+
