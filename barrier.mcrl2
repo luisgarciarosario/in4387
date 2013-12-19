@@ -1,0 +1,32 @@
+sort 	
+	Presign		= struct P1|P2|P3|P4;
+	Stopsign 	= struct S1|S2|S3|S4;
+
+	Barr		= struct B1|B2|B3|B4;
+	BState		= struct Up|Down;
+
+act
+	activatePresign		:Presign;
+ 	deactivatePresign	:Presign;
+	
+	activateStopSign	:Stopsign;
+ 	deactivateStopSign	:Stopsign; 
+	
+	openBarrier			:Barr;
+	closeBarrier		:Barr;
+	
+	readBarrierUpState	:BState;
+ 	readBarrierDownState:BState;
+
+proc
+	%a barrier can go up (open) when the bridge is closed (down), locked and the breaks are engaged.
+	
+	Barrier (b: Barr) = activatePresign . activateStopSign . readBarrierDownState;
+	
+init
+  allow(
+    { openBarrier, closeBarrier },
+    comm(
+      { activatePresign|... -> openBarrier, ...|... -> closeBarrier },
+      User || Barrier
+  ) ) ;
